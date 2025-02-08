@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html>
+  
+<head>
+    <title>guppy</title>
+    <style>
+        body {
+            display: flex;
+            justify-content: center;
+            padding-top: 50%;
+            font-family: sans-serif;
+        }
+          
+        #sheets {
+            width: 100px;
+            height: 100px;
+            background-image: url('./static/sheets.png'), url('./sheets.png');
+            position: absolute;
+            top: 30%;
+            animation: bounce 0.75s;
+            animation-direction: alternate;
+            animation-timing-function: cubic-bezier(.5, 0.05, 1, .5);
+            animation-iteration-count: infinite;
+        }
+
+        #sheets.no-animation {
+            animation: none;
+        }
+          
+        @keyframes bounce {
+            from {
+                transform: translate3d(0, 0, 0);
+            }
+            to {
+                transform: translate3d(0, 200px, 0);
+            }
+        }
+    </style>
+</head>
+  
+<body>
+    <script src="interstitial.js"></script>
+    
+    <div id="sheets"></div>
+    <div id="error" style="display:none;"></div>
+</body>
+  
+</html>
