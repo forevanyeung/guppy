@@ -1,4 +1,4 @@
-package main // import "gitlab.com/clburlison/cfprefs"
+package cf // import "gitlab.com/clburlison/cfprefs"
 
 import (
 	"unsafe"

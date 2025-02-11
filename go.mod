@@ -1,8 +1,9 @@
-module forevanyeung/guppy
+module github.com/forevanyeung/guppy
 
 go 1.23.5
 
 require (
+	github.com/spf13/cobra v1.8.1
 	github.com/zalando/go-keyring v0.2.6
 	golang.org/x/oauth2 v0.25.0
 	google.golang.org/api v0.219.0
@@ -22,6 +23,8 @@ require (
 	github.com/google/uuid v1.6.0 // indirect
 	github.com/googleapis/enterprise-certificate-proxy v0.3.4 // indirect
 	github.com/googleapis/gax-go/v2 v2.14.1 // indirect
+	github.com/inconshreveable/mousetrap v1.1.0 // indirect
+	github.com/spf13/pflag v1.0.5 // indirect
 	go.opentelemetry.io/contrib/instrumentation/net/http/otelhttp v0.54.0 // indirect
 	go.opentelemetry.io/otel v1.32.0 // indirect
 	go.opentelemetry.io/otel/metric v1.32.0 // indirect
