@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"log/slog"
 	"net/http"
 	"strings"
 
@@ -29,7 +30,7 @@ func auth(newAuthChan chan string, clientId string) {
 	// Check keyring if an auth token exists
 	auth, err := keyring.Get("com.forevanyeung.guppy.auth", "AccessToken")
 	if err == nil {
-		fmt.Println("Retrieved auth token from keyring")
+		slog.Info("Retrieved auth token from keyring")
 
 		token = Token{
 			&oauth2.Token{AccessToken: auth},
@@ -39,13 +40,13 @@ func auth(newAuthChan chan string, clientId string) {
 			pass = true	
 			openBrowser(fmt.Sprintf("http://localhost:%d/interstitial.html", listenPort))
 		} else {
-			fmt.Println("Auth token from keyring is no longer valid")
+			slog.Info("Auth token from keyring is no longer valid")
 		}
 	}
 
 	// If no token is found, or token is invalid, get a new token
 	if !pass {
-		fmt.Println("Getting a new auth token, opening browser")
+		slog.Info("Getting a new auth token, opening browser")
 
 		config := OAuthConfig{
 			Config: &oauth2.Config{
@@ -60,12 +61,12 @@ func auth(newAuthChan chan string, clientId string) {
 
 		// wait for response from auth server
 		newAuth := <-newAuthChan
-		fmt.Println("Received a new auth token")
+		slog.Info("Received a new auth token")
 
 		// Save the token in keyring
 		err = keyring.Set("com.forevanyeung.guppy.auth", "AccessToken", newAuth)
 		if err != nil {
-			fmt.Println("Error saving token to keyring", err)
+			slog.Error("Error saving token to keyring", "err", err)
 			return
 		}
 
@@ -79,7 +80,7 @@ func auth(newAuthChan chan string, clientId string) {
 	ctx := context.Background()
 	driveService, err = drive.NewService(ctx, option.WithTokenSource(oauth2.StaticTokenSource(token.Token)))
 	if err != nil {
-		fmt.Println("Error creating Drive service", err)
+		slog.Error("Error creating Drive service", "err", err)
 		return
 	}
 }
@@ -90,22 +91,20 @@ func (c *OAuthConfig) Login() {
 		"state",
 		oauth2.SetAuthURLParam("response_type", "token"),
 	)
-
-	// fmt.Println("Visit the URL for the auth dialog:", url)
-
+	
 	openBrowser(url)
 }
 
 func (t *Token) Logout() {
 	keyring.Delete("com.forevanyeung.guppy.auth", "AccessToken")
-	fmt.Println("Logged out and token deleted from keyring")
+	slog.Info("Logged out and token deleted from keyring")
 }
 
 func (t *Token) IsValid() bool {
 	uri := fmt.Sprintf("https://www.googleapis.com/oauth2/v3/tokeninfo?access_token=%s", t.Token.AccessToken)
 	res, err := http.Get(uri)
 	if err != nil {
-		fmt.Println(err)
+		slog.Error("Error checking token validity", "err", err)
 		return false
 	}
 
@@ -116,7 +115,7 @@ func (t *Token) IsValid() bool {
 
 	var result map[string]interface{}
 	if err := json.NewDecoder(res.Body).Decode(&result); err != nil {
-		fmt.Println("Error decoding JSON response:", err)
+		slog.Error("Error decoding JSON response", "err", err)
 		return false
 	}
 
@@ -124,7 +123,7 @@ func (t *Token) IsValid() bool {
 	// tokenScopes := result["scope"].(string)
 	// for _, s := range scope {
 	// 	if !contains(tokenScopes, s) {
-	// 		fmt.Println("Token does not have the required scope")
+	//		slog.Warn("Token does not have the required scope")
 	// 		return false
 	// 	}
 	// }

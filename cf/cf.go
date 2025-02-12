@@ -23,7 +23,6 @@ func cfstringToString(s C.CFStringRef) string {
 
 // Convert a CFBoolean to a Go bool
 func cfbooleanToBoolean(s C.CFBooleanRef) bool {
-	// fmt.Println(reflect.TypeOf(C.CFBooleanGetValue(s)))
 	if C.CFBooleanGetValue(s) == 1 {
 		return true
 	}

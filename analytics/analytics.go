@@ -2,8 +2,9 @@ package analytics
 
 import (
 	"fmt"
+	"log/slog"
 
-	"github.com/denisbrodbeck/machineid" // Import the cf package
+	"github.com/denisbrodbeck/machineid"
 	"github.com/posthog/posthog-go"
 )
 
@@ -18,15 +19,17 @@ func init() {
 		PosthogApiKey,
 		posthog.Config{
 			Endpoint: PosthogEndpoint,
+			Verbose: false,
 		},
 	)
 
 	id, _ = machineid.ProtectedID("guppy")
 
-	fmt.Println("Machine ID:", id)
+	slog.Info("Analytics initialized", "Machine Id", id)
 }
 
 func TrackEvent(event string, properties map[string]interface{}) {
+	// TODO: Add a configuration to disable analytics
 	// disableAnalytics := cf.CFPreferencesCopyAppValue("DisableAnalytics", "com.forevanyeung.guppy")
 	// if disableAnalytics != nil && disableAnalytics.(bool) {
 	// 	return
@@ -44,7 +47,7 @@ func TrackEvent(event string, properties map[string]interface{}) {
 
 	client.Enqueue(c)
 
-	fmt.Println("Event tracked:", event)
+	slog.Info(fmt.Sprintf("Event tracked: %s", event))
 }
 
 func Close() {

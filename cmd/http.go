@@ -3,6 +3,7 @@ package cmd
 import (
 	"encoding/json"
 	"fmt"
+	"log/slog"
 	"net/http"
 	"os"
 	"os/signal"
@@ -34,10 +35,10 @@ func httpServer(newAuthChan chan string, statusChan chan GuppyStatus, serverDone
 
 	// Start the server in a goroutine
 	go func() {
-		fmt.Println("Listening on port", listenPort)
+		slog.Info(fmt.Sprintf("Listening on port %d", listenPort))
 
 		if err := server.ListenAndServe(); err != nil && err != http.ErrServerClosed {
-			fmt.Printf("Server error: %v\n", err)
+			slog.Error("Server error", "err", err)
 		}
 	}()
 
@@ -48,9 +49,9 @@ func httpServer(newAuthChan chan string, statusChan chan GuppyStatus, serverDone
 	// Block until a signal is received
 	<-c
 
-	fmt.Println("Shutting down server...")
+	slog.Info("Shutting down server...")
 	server.Shutdown(nil) // Gracefully shut down the server
-	fmt.Println("Server stopped")
+	slog.Info("Server stopped")
 }
 
 func authHttp(newAuthChan chan string) func (w http.ResponseWriter, r *http.Request) {
@@ -65,7 +66,7 @@ func authHttp(newAuthChan chan string) func (w http.ResponseWriter, r *http.Requ
 		err := json.NewDecoder(r.Body).Decode(&res)
 		if err != nil {
 			http.Error(w, "Unable to decode request", http.StatusBadRequest)
-			fmt.Println(err)
+			slog.Error("Error decoding request", "err", err)
 			return
 		}
 

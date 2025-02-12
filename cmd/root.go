@@ -2,11 +2,19 @@ package cmd
 
 import (
 	"fmt"
+	"log/slog"
 	"os"
 
 	"github.com/forevanyeung/guppy/analytics"
 	"github.com/spf13/cobra"
 )
+
+var verbose bool
+
+func init() {
+	// TODO: add verbose flag
+	rootCmd.PersistentFlags().BoolVarP(&verbose, "verbose", "v", false, "verbose output")
+}
 
 var rootCmd = &cobra.Command{
 	Use:   "guppy [file]",
@@ -31,7 +39,7 @@ var rootCmd = &cobra.Command{
 
 func Execute() {
 	if err := rootCmd.Execute(); err != nil {
-		fmt.Fprintln(os.Stderr, err)
+		slog.Error("Error executing root command", "err", err)
 		os.Exit(1)
 	}
 }

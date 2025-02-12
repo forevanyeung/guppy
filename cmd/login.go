@@ -1,7 +1,7 @@
 package cmd
 
 import (
-	"fmt"
+	"log/slog"
 
 	"github.com/forevanyeung/guppy/analytics"
 	"github.com/spf13/cobra"
@@ -20,6 +20,6 @@ var loginCmd = &cobra.Command{
 		})
 
 		// Implement login logic here
-		fmt.Println("Login command executed")
+		slog.Info("Login command executed")
 	},
 }

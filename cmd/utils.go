@@ -2,6 +2,7 @@ package cmd
 
 import (
 	"fmt"
+	"log/slog"
 	"math/rand"
 	"mime"
 	"os"
@@ -29,7 +30,8 @@ func openBrowser(url string) {
 	}
 
 	if err != nil {
-		fmt.Printf("Failed to open browser: %v\n", err)
+		fmt.Println("Please open the URL in your browser:", url)
+		slog.Error("Failed to open browser:", "err", err)
 	}
 }
 
@@ -42,7 +44,7 @@ func generateState() string {
 func uploadFile(filePath string, uploadStatus chan GuppyStatus) {
 	file, err := os.Open(filePath)
 	if err != nil {
-		fmt.Println("Error opening file:", err)
+		slog.Error("Error opening file:", "err", err)
 		uploadStatus <- GuppyStatus{UploadError: "Error opening file"}
 		return
 	}
@@ -51,8 +53,9 @@ func uploadFile(filePath string, uploadStatus chan GuppyStatus) {
 	// get the MIME type of the file
 	mimeType := getMimeType(filePath)
 
-	fmt.Println("MIME type:", mimeType)
+	slog.Info(fmt.Sprintf("MIME type: %s", mimeType))
 
+	// TODO: pick mimetype based on file extension
 	f := &drive.File{
 		Name:     filepath.Base(filePath),
 		MimeType: "application/vnd.google-apps.spreadsheet",
@@ -60,7 +63,7 @@ func uploadFile(filePath string, uploadStatus chan GuppyStatus) {
 
 	createdFile, err := driveService.Files.Create(f).Media(file, googleapi.ContentType(mimeType)).Fields("webViewLink").Do()
 	if err != nil {
-		fmt.Println("Error creating file:", err)
+		slog.Error("Error creating file:", "err", err)
 		uploadStatus <- GuppyStatus{UploadError: "Error uploading file to Google Drive"}
 		return
 	}
@@ -70,6 +73,7 @@ func uploadFile(filePath string, uploadStatus chan GuppyStatus) {
 		WebLink: createdFile.WebViewLink,
 	}
 
+	// TODO: track actual data for analytics
 	analytics.TrackEvent("upload_done", map[string]interface{}{
 		"guppy_version": "0.0.0",
 		"guppy_platform": "cli",

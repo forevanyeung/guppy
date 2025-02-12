@@ -1,7 +1,7 @@
 package cmd
 
 import (
-	"fmt"
+	"log/slog"
 
 	"github.com/forevanyeung/guppy/analytics"
 	"github.com/forevanyeung/guppy/cf"
@@ -47,7 +47,7 @@ func upload(filePath string) {
 	domain := "com.forevanyeung.guppy"
 	value := cf.CFPreferencesCopyAppValue("GoogleOauth2ClientId", domain)
 	if value == nil {
-		fmt.Printf("Missing %s configuration\n", domain)
+		slog.Error("Missing GoogleOauth2ClientId configuration")
 		return
 	}
 
