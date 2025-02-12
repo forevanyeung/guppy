@@ -6,14 +6,24 @@ import (
 	"os"
 
 	"github.com/forevanyeung/guppy/analytics"
+	"github.com/forevanyeung/guppy/internal"
 	"github.com/spf13/cobra"
 )
 
 var verbose bool
+var desktop bool
 
 func init() {
-	// TODO: add verbose flag
 	rootCmd.PersistentFlags().BoolVarP(&verbose, "verbose", "v", false, "verbose output")
+	rootCmd.PersistentFlags().BoolVar(&desktop, "desktop", false, "")
+	rootCmd.PersistentFlags().MarkHidden("desktop")
+	cobra.OnInitialize(initConfig)
+}
+
+func initConfig() {
+	internal.SetVerbose(verbose)
+	internal.SetDesktop(desktop)
+	analytics.Initialize()
 }
 
 var rootCmd = &cobra.Command{
@@ -22,6 +32,9 @@ var rootCmd = &cobra.Command{
 	Long:  `Guppy can be used as a file handler to associate with file types and open them in Google Drive, or also as
 			a command line tool to upload files to Google Drive.`,
 	Args:  cobra.MaximumNArgs(1),
+	CompletionOptions: cobra.CompletionOptions{
+		DisableDefaultCmd: true,
+	},
 	Run: func(cmd *cobra.Command, args []string) {
 		analytics.TrackEvent("$pageview", map[string]interface{}{
 			"$current_url": "root",

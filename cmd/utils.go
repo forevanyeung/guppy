@@ -75,9 +75,7 @@ func uploadFile(filePath string, uploadStatus chan GuppyStatus) {
 
 	// TODO: track actual data for analytics
 	analytics.TrackEvent("upload_done", map[string]interface{}{
-		"guppy_version": "0.0.0",
-		"guppy_platform": "cli",
-		"os_platform": "darwin",
+		"auth": "cached|new",
 		"duration": 0,
 		"file_size_kb": 100,
 		"file_type": "csv",

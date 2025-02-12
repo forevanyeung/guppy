@@ -3,8 +3,10 @@ package analytics
 import (
 	"fmt"
 	"log/slog"
+	"runtime"
 
 	"github.com/denisbrodbeck/machineid"
+	"github.com/forevanyeung/guppy/internal"
 	"github.com/posthog/posthog-go"
 )
 
@@ -13,17 +15,29 @@ var PosthogEndpoint = ""
 
 var client posthog.Client
 var id string
+var meta map[string]interface{}
 
-func init() {
+func Initialize() {
 	client, _ = posthog.NewWithConfig(
 		PosthogApiKey,
 		posthog.Config{
 			Endpoint: PosthogEndpoint,
-			Verbose: false,
+			Verbose: internal.IsVerbose(),
 		},
 	)
 
 	id, _ = machineid.ProtectedID("guppy")
+
+	meta = map[string]interface{}{
+		"guppy_version": internal.Version,
+		"guppy_platform": func() string {
+			if internal.IsDesktop() {
+				return "desktop"
+			}
+			return "cli"
+		}(),
+		"os_platform": runtime.GOOS,
+	}
 
 	slog.Info("Analytics initialized", "Machine Id", id)
 }
@@ -37,6 +51,13 @@ func TrackEvent(event string, properties map[string]interface{}) {
 
 	if client == nil {
 		return
+	}
+
+	// Merge meta properties to be included with every event into the properties map
+	for key, value := range meta {
+		if _, exists := properties[key]; !exists {
+			properties[key] = value
+		}
 	}
 
 	c := posthog.Capture{
