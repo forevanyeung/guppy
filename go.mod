@@ -3,6 +3,8 @@ module github.com/forevanyeung/guppy
 go 1.23.5
 
 require (
+	github.com/denisbrodbeck/machineid v1.0.1
+	github.com/posthog/posthog-go v1.2.24
 	github.com/spf13/cobra v1.8.1
 	github.com/zalando/go-keyring v0.2.6
 	golang.org/x/oauth2 v0.25.0

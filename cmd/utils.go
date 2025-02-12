@@ -9,6 +9,7 @@ import (
 	"path/filepath"
 	"runtime"
 
+	"github.com/forevanyeung/guppy/analytics"
 	"google.golang.org/api/drive/v3"
 	"google.golang.org/api/googleapi"
 )
@@ -68,6 +69,15 @@ func uploadFile(filePath string, uploadStatus chan GuppyStatus) {
 		UploadFinished: true, 
 		WebLink: createdFile.WebViewLink,
 	}
+
+	analytics.TrackEvent("upload_done", map[string]interface{}{
+		"guppy_version": "0.0.0",
+		"guppy_platform": "cli",
+		"os_platform": "darwin",
+		"duration": 0,
+		"file_size_kb": 100,
+		"file_type": "csv",
+	})
 }
 
 func getMimeType(filePath string) string {

@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"os"
 
+	"github.com/forevanyeung/guppy/analytics"
 	"github.com/spf13/cobra"
 )
 
@@ -14,6 +15,10 @@ var rootCmd = &cobra.Command{
 			a command line tool to upload files to Google Drive.`,
 	Args:  cobra.MaximumNArgs(1),
 	Run: func(cmd *cobra.Command, args []string) {
+		analytics.TrackEvent("$pageview", map[string]interface{}{
+			"$current_url": "root",
+		})
+
 		// Check if a file path is provided as a command line argument
 		if len(args) == 1 {
 			filePath := args[0]
@@ -25,8 +30,6 @@ var rootCmd = &cobra.Command{
 }
 
 func Execute() {
-	rootCmd.AddCommand(loginCmd)
-	rootCmd.AddCommand(uploadCmd)
 	if err := rootCmd.Execute(); err != nil {
 		fmt.Fprintln(os.Stderr, err)
 		os.Exit(1)

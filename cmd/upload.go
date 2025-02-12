@@ -3,6 +3,7 @@ package cmd
 import (
 	"fmt"
 
+	"github.com/forevanyeung/guppy/analytics"
 	"github.com/forevanyeung/guppy/cf"
 	"github.com/spf13/cobra"
 	"google.golang.org/api/drive/v3"
@@ -17,6 +18,10 @@ var uploadCmd = &cobra.Command{
 	Short: "Upload a file to Google Drive",
 	Args:  cobra.ExactArgs(1),
 	Run: func(cmd *cobra.Command, args []string) {
+		analytics.TrackEvent("$pageview", map[string]interface{}{
+			"$current_url": "upload",
+		})
+		
 		filePath := args[0]
 		upload(filePath)
 	},
