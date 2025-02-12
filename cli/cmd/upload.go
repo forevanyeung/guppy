@@ -2,6 +2,7 @@ package cmd
 
 import (
 	"log/slog"
+	"net"
 
 	"github.com/forevanyeung/guppy/cli/analytics"
 	"github.com/forevanyeung/guppy/cli/cf"
@@ -27,7 +28,7 @@ var uploadCmd = &cobra.Command{
 	},
 }
 
-var listenPort int = 8080
+var listenPort int
 
 type GuppyStatus struct {
 	IsAuthenticated bool   `json:"isAuthenticated"`
@@ -40,8 +41,14 @@ type GuppyStatus struct {
 var driveService *drive.Service
 
 func upload(filePath string) {
-	// TODO pick a random open port
-	listenPort = 8080
+	// Find an available port
+	listener, err := net.Listen("tcp", ":0")
+	if err != nil {
+		slog.Error("Failed to find an available port", "error", err)
+		return
+	}
+	listenPort = listener.Addr().(*net.TCPAddr).Port
+	listener.Close()
 
 	// Get the Google OAuth2 client ID from the configuration
 	domain := "com.forevanyeung.guppy"

@@ -7,6 +7,8 @@ import (
 	"net/http"
 	"os"
 	"os/signal"
+	"path/filepath"
+	"runtime"
 	"syscall"
 )
 
@@ -23,8 +25,15 @@ type OAuthResponseError struct {
 }
 
 func httpServer(newAuthChan chan string, statusChan chan GuppyStatus, serverDoneChan chan bool) {
+	// Get the directory of the current file
+	_, filename, _, _ := runtime.Caller(0)
+	dir := filepath.Dir(filename)
+
+	// Construct the path relative to the current file
+	staticDir := filepath.Join(dir, "../static")
+	
 	mux := http.NewServeMux()
-	mux.Handle("GET /", http.FileServer(http.Dir("./static")))
+	mux.Handle("GET /", http.FileServer(http.Dir(staticDir)))
 	mux.HandleFunc("POST /auth", authHttp(newAuthChan))
 	mux.HandleFunc("GET /status", statusHttp(statusChan, serverDoneChan))
 
