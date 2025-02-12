@@ -3,7 +3,6 @@ package cmd
 import (
 	"fmt"
 	"log/slog"
-	"math/rand"
 	"mime"
 	"os"
 	"os/exec"
@@ -33,12 +32,6 @@ func openBrowser(url string) {
 		fmt.Println("Please open the URL in your browser:", url)
 		slog.Error("Failed to open browser:", "err", err)
 	}
-}
-
-// This generates a 16-character state string (128 bits), which is generally sufficient for local OAuth flows.
-// If you want it even simpler and faster, you can use Go’s math/rand (less secure but faster).
-func generateState() string {
-	return fmt.Sprintf("%016x", rand.Int63())
 }
 
 func uploadFile(filePath string, uploadStatus chan GuppyStatus) {
