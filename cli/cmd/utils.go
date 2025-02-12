@@ -10,7 +10,7 @@ import (
 	"path/filepath"
 	"runtime"
 
-	"github.com/forevanyeung/guppy/analytics"
+	"github.com/forevanyeung/guppy/cli/analytics"
 	"google.golang.org/api/drive/v3"
 	"google.golang.org/api/googleapi"
 )

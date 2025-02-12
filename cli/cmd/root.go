@@ -5,8 +5,8 @@ import (
 	"log/slog"
 	"os"
 
-	"github.com/forevanyeung/guppy/analytics"
-	"github.com/forevanyeung/guppy/internal"
+	"github.com/forevanyeung/guppy/cli/analytics"
+	"github.com/forevanyeung/guppy/cli/internal"
 	"github.com/spf13/cobra"
 )
 

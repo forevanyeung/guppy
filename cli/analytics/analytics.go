@@ -6,7 +6,7 @@ import (
 	"runtime"
 
 	"github.com/denisbrodbeck/machineid"
-	"github.com/forevanyeung/guppy/internal"
+	"github.com/forevanyeung/guppy/cli/internal"
 	"github.com/posthog/posthog-go"
 )
 

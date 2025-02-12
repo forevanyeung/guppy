@@ -3,7 +3,7 @@ package cmd
 import (
 	"log/slog"
 
-	"github.com/forevanyeung/guppy/analytics"
+	"github.com/forevanyeung/guppy/cli/analytics"
 	"github.com/spf13/cobra"
 )
 

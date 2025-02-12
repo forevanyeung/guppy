@@ -3,8 +3,8 @@ package cmd
 import (
 	"log/slog"
 
-	"github.com/forevanyeung/guppy/analytics"
-	"github.com/forevanyeung/guppy/cf"
+	"github.com/forevanyeung/guppy/cli/analytics"
+	"github.com/forevanyeung/guppy/cli/cf"
 	"github.com/spf13/cobra"
 	"google.golang.org/api/drive/v3"
 )
