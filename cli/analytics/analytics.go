@@ -6,6 +6,7 @@ import (
 	"runtime"
 
 	"github.com/denisbrodbeck/machineid"
+	"github.com/forevanyeung/guppy/cli/cf"
 	"github.com/forevanyeung/guppy/cli/internal"
 	"github.com/posthog/posthog-go"
 )
@@ -18,6 +19,11 @@ var id string
 var meta map[string]interface{}
 
 func Initialize() {
+	disableAnalytics := cf.CFPreferencesCopyAppValue("DisableAnalytics", "com.forevanyeung.guppy")
+	if disableAnalytics != nil && disableAnalytics.(bool) {
+		return
+	}
+
 	client, _ = posthog.NewWithConfig(
 		PosthogApiKey,
 		posthog.Config{
@@ -43,12 +49,6 @@ func Initialize() {
 }
 
 func TrackEvent(event string, properties map[string]interface{}) {
-	// TODO: Add a configuration to disable analytics
-	// disableAnalytics := cf.CFPreferencesCopyAppValue("DisableAnalytics", "com.forevanyeung.guppy")
-	// if disableAnalytics != nil && disableAnalytics.(bool) {
-	// 	return
-	// }
-
 	if client == nil {
 		return
 	}

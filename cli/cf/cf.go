@@ -55,7 +55,7 @@ func CFPreferencesCopyAppValue(key string, domain string) interface{} {
 		defer release(ret)
 		return cfdataToData(C.CFDataRef(ret))
 	}
-	return ""
+	return nil
 }
 
 func release(ref C.CFTypeRef) {
