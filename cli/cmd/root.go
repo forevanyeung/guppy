@@ -1,6 +1,7 @@
 package cmd
 
 import (
+	"context"
 	"fmt"
 	"log/slog"
 	"os"
@@ -20,10 +21,24 @@ func init() {
 	cobra.OnInitialize(initConfig)
 }
 
+type warnLevel struct {
+	slog.Handler
+}
+
+func (warnLevel) Enabled(_ context.Context, level slog.Level) bool {
+	return level >= slog.LevelWarn
+}
+
 func initConfig() {
 	internal.SetVerbose(verbose)
 	internal.SetDesktop(desktop)
 	analytics.Initialize()
+
+	// unsafe
+	if !internal.IsVerbose() {
+		h := slog.Default().Handler()
+		*slog.Default() = *slog.New(warnLevel{h})
+	}
 }
 
 var rootCmd = &cobra.Command{
