@@ -21,6 +21,7 @@ var meta map[string]interface{}
 func Initialize() {
 	disableAnalytics := cf.CFPreferencesCopyAppValue("DisableAnalytics", "com.forevanyeung.guppy")
 	if disableAnalytics != nil && disableAnalytics.(bool) {
+		slog.Info("Analytics disabled")
 		return
 	}
 
