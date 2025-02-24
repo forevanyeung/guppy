@@ -13,8 +13,6 @@ struct guppyApp: App {
     @NSApplicationDelegateAdaptor(AppDelegate.self) var appDelegate
 
     var body: some Scene {
-        NSLog("Hellow guppy")
-        
         return Settings {
             EmptyView()
         }
@@ -24,11 +22,9 @@ struct guppyApp: App {
 class AppDelegate: NSObject, NSApplicationDelegate {
     override init() {
         super.init()
-        NSLog("AppDelegate init")
     }
     
     func application(_ application: NSApplication, open urls: [URL]) {
-        NSLog("Application opened with URLs:")
         for url in urls {
             processFile(at: url)
         }
@@ -40,8 +36,6 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     }
     
     func applicationDidFinishLaunching(_ notification: Notification) {
-        NSLog("applicationDidFinishLaunching(_:) called")
-        
         // Filter and process command line arguments
         let relevantArguments = CommandLine.arguments.dropFirst().filter { arg in
             !arg.hasPrefix("-") && arg != "YES" && !arg.hasSuffix(".app")
@@ -79,15 +73,18 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         let pipe = Pipe()
         process.standardOutput = pipe
         process.standardError = pipe
-        
+
+        let fileHandle = pipe.fileHandleForReading
+
+        fileHandle.readabilityHandler = { fileHandle in
+            let data = fileHandle.availableData
+            if let output = String(data: data, encoding: .utf8), !output.isEmpty {
+                NSLog(output)
+            }
+        }
+
         do {
             try process.run()
-            let data = pipe.fileHandleForReading.readDataToEndOfFile()
-            // TODO: log line by line, instead of waiting to exit
-            if let output = String(data: data, encoding: .utf8) {
-                print("Guppy output:")
-                print(output)
-            }
             process.waitUntilExit()
             
             if process.terminationStatus == 0 {
@@ -96,8 +93,11 @@ class AppDelegate: NSObject, NSApplicationDelegate {
                 NSLog("Guppy encountered an error. Exit code: \(process.terminationStatus)")
             }
         } catch {
-            NSLog("Error running Guppy: \(error.localizedDescription)")
+            print("Failed to run process: \(error)")
         }
+
+        // Remove the readability handler when done
+        fileHandle.readabilityHandler = nil
     }
     
     private func locateBinary(name: String) -> String? {
