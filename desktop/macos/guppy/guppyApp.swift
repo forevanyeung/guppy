@@ -62,8 +62,6 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     private func processFile(at url: URL) {
         NSLog("File opened: \(url.path)")
         
-        // TODO: guppy binary is running inside sandbox so it doesnt have access to a lot of settings like
-        // preferences or can open webserver, getting 403
         guard let guppyBin = locateBinary(name: "guppy") else {
             NSLog("Could not find guppy binary")
             return
