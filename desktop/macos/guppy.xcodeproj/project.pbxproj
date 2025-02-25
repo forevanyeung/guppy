@@ -40,6 +40,11 @@
 /* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
+		8D6354FD2D6D43C000622097 /* scripts */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			path = scripts;
+			sourceTree = "<group>";
+		};
 		8D805D592D5D2CF600F13923 /* guppy */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
 			exceptions = (
@@ -88,6 +93,7 @@
 		8D805D4E2D5D2CF500F13923 = {
 			isa = PBXGroup;
 			children = (
+				8D6354FD2D6D43C000622097 /* scripts */,
 				8D805D592D5D2CF600F13923 /* guppy */,
 				8D805D6B2D5D2CF900F13923 /* guppyTests */,
 				8D805D752D5D2CF900F13923 /* guppyUITests */,
@@ -262,7 +268,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "\"${PROJECT_DIR}/copy_guppy_binary.sh\"\n";
+			shellScript = "\"${PROJECT_DIR}/scripts/copy_guppy_binary.sh\"\n";
 		};
 /* End PBXShellScriptBuildPhase section */
 
