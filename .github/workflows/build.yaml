@@ -24,7 +24,14 @@ jobs:
         id: gitversion
         uses: gittools/actions/gitversion/execute@v3
 
-      - name: Build
+      - uses: actions/setup-go@v5
+        with:
+          go-version-file: 'go.mod'
+
+      - name: Install Go dependencies
+        run: go get .
+
+      - name: Build guppy
         env:
           VERSION: ${{ steps.gitversion.outputs.MajorMinorPatch }}
           POSTHOG_ENDPOINT: ${{ secrets.POSTHOG_ENDPOINT }}
