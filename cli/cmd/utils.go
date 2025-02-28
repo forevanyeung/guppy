@@ -51,7 +51,7 @@ func uploadFile(filePath string, uploadStatus chan GuppyStatus) {
 	// TODO: pick mimetype based on file extension
 	f := &drive.File{
 		Name:     filepath.Base(filePath),
-		MimeType: "application/vnd.google-apps.spreadsheet",
+		MimeType: mapMimeTypeToGoogleMimeType(mimeType),
 	}
 
 	createdFile, err := driveService.Files.Create(f).Media(file, googleapi.ContentType(mimeType)).Fields("webViewLink").Do()
@@ -71,7 +71,7 @@ func uploadFile(filePath string, uploadStatus chan GuppyStatus) {
 		"auth": "cached|new",
 		"duration": 0,
 		"file_size_kb": 100,
-		"file_type": "csv",
+		"file_type": mimeType,
 	})
 }
 
@@ -82,4 +82,24 @@ func getMimeType(filePath string) string {
 	// Use the mime package to detect the MIME type
 	mimeType := mime.TypeByExtension(ext)
 	return mimeType
+}
+
+func mapMimeTypeToGoogleMimeType(mimeType string) string {
+	// Map the MIME type to the Google MIME type
+	switch mimeType {
+	case "text/csv":
+		return "application/vnd.google-apps.spreadsheet"
+	case "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet":
+		return "application/vnd.google-apps.spreadsheet"
+	case "text/plain":
+		return "application/vnd.google-apps.document"
+	case "application/pdf":
+		return "application/vnd.google-apps.document"
+	case "application/vnd.openxmlformats-officedocument.wordprocessingml.document":
+		return "application/vnd.google-apps.document"
+	case "application/vnd.openxmlformats-officedocument.presentationml.presentation":
+		return "application/vnd.google-apps.presentation"
+	default:
+		return "application/vnd.google-apps.unknown"
+	}
 }
