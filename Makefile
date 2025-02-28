@@ -1,5 +1,8 @@
 #!make
-include .env
+
+ifneq (,$(wildcard .env))
+    include .env
+endif
 
 .PHONY: run
 
