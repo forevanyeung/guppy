@@ -43,6 +43,7 @@ func initConfig() {
 
 var rootCmd = &cobra.Command{
 	Use:   "guppy [file]",
+	Version: internal.Version,
 	Short: "Guppy is simple tool for opening files in Google Drive",
 	Long:  `Guppy can be used as a file handler to associate with file types and open them in Google Drive, or also as
 			a command line tool to upload files to Google Drive.`,
