@@ -1,0 +1,46 @@
+name: Build guppy
+
+on: 
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+jobs:
+  build_cli:
+    if: github.event_name == 'workflow_dispatch' || contains(github.event.head_commit.message, '[build]')
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Install GitVersion
+        uses: gittools/actions/gitversion/setup@v3
+        with:
+          versionSpec: '6.0.x'
+
+      - name: Determine Version
+        id: gitversion
+        uses: gittools/actions/gitversion/execute@v3
+
+      - name: Build
+        env:
+          VERSION: ${{ steps.gitversion.outputs.MajorMinorPatch }}
+          POSTHOG_ENDPOINT: ${{ secrets.POSTHOG_ENDPOINT }}
+          POSTHOG_API_KEY: ${{ secrets.POSTHOG_API_KEY }}
+        run: make build
+
+      - name: Archive Binary
+        id: archive
+        env:
+          VERSION: ${{ steps.gitversion.outputs.MajorMinorPatch }}
+        run: |
+          tar -czvf guppy-${{ env.VERSION }}.tar.gz ./cli/dist/guppy
+          echo "GUPPYPATH=guppy-${{ env.VERSION }}.tar.gz" >> $GITHUB_OUTPUT
+
+      - name: Upload Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: guppy
+          path: ${{ steps.archive.outputs.GUPPYPATH }}
