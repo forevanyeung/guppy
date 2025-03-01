@@ -33,3 +33,17 @@ build: clean
 	-X github.com/forevanyeung/guppy/cli/analytics.PosthogApiKey=$(POSTHOG_API_KEY) \
 	$(if $(VERSION),-X github.com/forevanyeung/guppy/cli/internal.Version=$(VERSION))" \
 	-o ./cli/dist/guppy ./cli
+
+.PHONY: clean-macos
+
+clean-macos: 
+	rm -rf ./macos/build
+
+.PHONY: build-macos
+
+build-macos: clean-macos
+	xcodebuild -project macos/guppy.xcodeproj \
+	-scheme guppy build \
+	CONFIGURATION_BUILD_DIR="$(PWD)/macos/build" \
+	$(if $(VERSION),MARKETING_VERSION="$(VERSION)") \
+	$(if $(BUILD),CURRENT_PROJECT_VERSION="$(BUILD)")

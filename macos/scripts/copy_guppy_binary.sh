@@ -1,5 +1,5 @@
 # Define the source and destination paths
-SOURCE_PATH="${PROJECT_DIR}/../../cli/build/guppy"  # Adjust this path to where your Guppy binary is located
+SOURCE_PATH="${PROJECT_DIR}/../cli/dist/guppy"  # Adjust this path to where your Guppy binary is located
 DEST_PATH="${BUILT_PRODUCTS_DIR}/${PRODUCT_NAME}.app/Contents/Resources"
 
 # Ensure the destination directory exists
