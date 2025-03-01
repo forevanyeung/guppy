@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"log/slog"
 	"os"
+	"time"
 
 	"github.com/forevanyeung/guppy/cli/analytics"
 	"github.com/forevanyeung/guppy/cli/internal"
@@ -13,8 +14,10 @@ import (
 
 var verbose bool
 var desktop bool
+var commandStartTime time.Time
 
 func init() {
+	commandStartTime = time.Now()
 	rootCmd.PersistentFlags().BoolVarP(&verbose, "verbose", "v", false, "verbose output")
 	rootCmd.PersistentFlags().BoolVar(&desktop, "desktop", false, "")
 	rootCmd.PersistentFlags().MarkHidden("desktop")

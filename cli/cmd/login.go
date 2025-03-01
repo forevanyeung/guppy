@@ -43,6 +43,8 @@ type OAuthConfig struct {
 	*oauth2.Config
 }
 
+var authSource string
+
 func auth(newAuthChan chan string, clientId string) {
 	var token Token
 	var pass bool
@@ -57,7 +59,8 @@ func auth(newAuthChan chan string, clientId string) {
 		}
 
 		if token.IsValid() {
-			pass = true	
+			pass = true
+			authSource = "cached"
 			openBrowser(fmt.Sprintf("http://localhost:%d/interstitial.html", listenPort))
 		} else {
 			slog.Info("Auth token from keyring is no longer valid")
@@ -67,6 +70,7 @@ func auth(newAuthChan chan string, clientId string) {
 	// If no token is found, or token is invalid, get a new token
 	if !pass {
 		slog.Info("Getting a new auth token, opening browser")
+		authSource = "fresh"
 
 		config := OAuthConfig{
 			Config: &oauth2.Config{

@@ -8,6 +8,7 @@ import (
 	"os/exec"
 	"path/filepath"
 	"runtime"
+	"time"
 
 	"github.com/forevanyeung/guppy/cli/analytics"
 	"google.golang.org/api/drive/v3"
@@ -74,8 +75,8 @@ func uploadFile(filePath string, uploadStatus chan GuppyStatus) {
 	fileSizeKB := float64(fileInfo.Size()) / 1024.0
 
 	analytics.TrackEvent("upload_done", map[string]interface{}{
-		"auth": "cached|new",
-		"duration": 0,
+		"auth": authSource,
+		"duration": time.Since(commandStartTime).Seconds(),
 		"file_size_kb": fileSizeKB,
 		"file_type": mimeType,
 	})
