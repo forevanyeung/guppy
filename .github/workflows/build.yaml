@@ -53,35 +53,35 @@ jobs:
           path: ${{ steps.archive.outputs.GUPPYPATH }}
           retention-days: 1
 
-  build_macos:
-  if: github.event_name == 'workflow_dispatch' || contains(github.event.head_commit.message, '[build]')
-  needs: build_cli
-  runs-on: macos-latest
-  steps:
-    - uses: actions/checkout@v4
-      with:
-        fetch-depth: 0
+  # build_macos:
+  # if: github.event_name == 'workflow_dispatch' || contains(github.event.head_commit.message, '[build]')
+  # needs: build_cli
+  # runs-on: macos-latest
+  # steps:
+  #   - uses: actions/checkout@v4
+  #     with:
+  #       fetch-depth: 0
     
-    - uses: actions/download-artifact@v4
-      with:
-        name: guppy
-        path: ./cli/dist/guppy
+  #   - uses: actions/download-artifact@v4
+  #     with:
+  #       name: guppy
+  #       path: ./cli/dist/guppy
 
-    - name: Sign guppy binary
-      run: codesign -s - ./cli/dist/guppy
+  #   - name: Sign guppy binary
+  #     run: codesign -s - ./cli/dist/guppy
 
-    - name: Build macOS app
-      env: 
-        VERSION: ${{ needs.build_cli.outputs.VERSION }}
-        BUILD: ${{ needs.build_cli.outputs.BUILD }}
-      run: make build-macos
+  #   - name: Build macOS app
+  #     env: 
+  #       VERSION: ${{ needs.build_cli.outputs.VERSION }}
+  #       BUILD: ${{ needs.build_cli.outputs.BUILD }}
+  #     run: make build-macos
 
-    - name: Package macOS app
-      run: ditto -c -k --keepParent ./macos/build/guppy.app ./guppy-macos-${{ env.VERSION }}.zip
+  #   - name: Package macOS app
+  #     run: ditto -c -k --keepParent ./macos/build/guppy.app ./guppy-macos-${{ env.VERSION }}.zip
 
-    - name: Upload macOS app
-      uses: actions/upload-artifact@v4
-      with:
-        name: guppy-macos
-        path: ./guppy-macos-${{ env.VERSION }}.zip
-        retention-days: 1
+  #   - name: Upload macOS app
+  #     uses: actions/upload-artifact@v4
+  #     with:
+  #       name: guppy-macos
+  #       path: ./guppy-macos-${{ env.VERSION }}.zip
+  #       retention-days: 1
