@@ -48,7 +48,6 @@ func uploadFile(filePath string, uploadStatus chan GuppyStatus) {
 
 	slog.Info(fmt.Sprintf("MIME type: %s", mimeType))
 
-	// TODO: pick mimetype based on file extension
 	f := &drive.File{
 		Name:     filepath.Base(filePath),
 		MimeType: mapMimeTypeToGoogleMimeType(mimeType),
@@ -66,11 +65,18 @@ func uploadFile(filePath string, uploadStatus chan GuppyStatus) {
 		WebLink: createdFile.WebViewLink,
 	}
 
-	// TODO: track actual data for analytics
+	// Calculate file size after successful upload
+	fileInfo, err := os.Stat(filePath)
+	if err != nil {
+		slog.Error("Error getting file info:", "err", err)
+		// Don't return here as the upload was successful
+	}
+	fileSizeKB := float64(fileInfo.Size()) / 1024.0
+
 	analytics.TrackEvent("upload_done", map[string]interface{}{
 		"auth": "cached|new",
 		"duration": 0,
-		"file_size_kb": 100,
+		"file_size_kb": fileSizeKB,
 		"file_type": mimeType,
 	})
 }
