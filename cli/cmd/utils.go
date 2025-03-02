@@ -96,16 +96,22 @@ func mapMimeTypeToGoogleMimeType(mimeType string) string {
 	switch mimeType {
 	case "text/csv":
 		return "application/vnd.google-apps.spreadsheet"
+	
 	case "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet":
 		return "application/vnd.google-apps.spreadsheet"
+	
 	case "text/plain":
 		return "application/vnd.google-apps.document"
+	
 	case "application/pdf":
 		return "application/vnd.google-apps.document"
+	
 	case "application/vnd.openxmlformats-officedocument.wordprocessingml.document":
 		return "application/vnd.google-apps.document"
+	
 	case "application/vnd.openxmlformats-officedocument.presentationml.presentation":
 		return "application/vnd.google-apps.presentation"
+	
 	default:
 		return "application/vnd.google-apps.unknown"
 	}

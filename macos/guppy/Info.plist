@@ -6,6 +6,18 @@
 	<array>
 		<dict>
 			<key>CFBundleTypeName</key>
+			<string>Text File</string>
+			<key>CFBundleTypeRole</key>
+			<string>Editor</string>
+			<key>LSHandlerRank</key>
+			<string>Default</string>
+			<key>LSItemContentTypes</key>
+			<array>
+				<string>public.text</string>
+			</array>
+		</dict>
+		<dict>
+			<key>CFBundleTypeName</key>
 			<string>CSV File</string>
 			<key>CFBundleTypeRole</key>
 			<string>Editor</string>
@@ -13,26 +25,44 @@
 			<string>Default</string>
 			<key>LSItemContentTypes</key>
 			<array>
-				<string>public.comma-separated-values-text</string>
+				<string>public.csv</string>
 			</array>
 		</dict>
-	</array>
-	<key>UTExportedTypeDeclarations</key>
-	<array>
 		<dict>
-			<key>UTTypeConformsTo</key>
+			<key>CFBundleTypeName</key>
+			<string>XLSX File</string>
+			<key>CFBundleTypeRole</key>
+			<string>Editor</string>
+			<key>LSHandlerRank</key>
+			<string>Default</string>
+			<key>LSItemContentTypes</key>
 			<array>
-				<string>public.data</string>
-				<string>public.content</string>
+				<string>org.openxmlformats.spreadsheetml.sheet</string>
 			</array>
-			<key>UTTypeDescription</key>
-			<string>CSV File</string>
-			<key>UTTypeIcons</key>
-			<dict/>
-			<key>UTTypeIdentifier</key>
-			<string>public.comma-separated-values-text</string>
-			<key>UTTypeTagSpecification</key>
-			<dict/>
+		</dict>
+		<dict>
+			<key>CFBundleTypeName</key>
+			<string>DOCX File</string>
+			<key>CFBundleTypeRole</key>
+			<string>Editor</string>
+			<key>LSHandlerRank</key>
+			<string>Default</string>
+			<key>LSItemContentTypes</key>
+			<array>
+				<string>org.openxmlformats.wordprocessingml.document</string>
+			</array>
+		</dict>
+		<dict>
+			<key>CFBundleTypeName</key>
+			<string>PPTX File</string>
+			<key>CFBundleTypeRole</key>
+			<string>Editor</string>
+			<key>LSHandlerRank</key>
+			<string>Default</string>
+			<key>LSItemContentTypes</key>
+			<array>
+				<string>org.openxmlformats.presentationml.presentation</string>
+			</array>
 		</dict>
 	</array>
 </dict>
