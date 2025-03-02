@@ -117,7 +117,7 @@ jobs:
           security list-keychain -d user -s $KEYCHAIN_PATH
 
       - name: Sign guppy binary
-        run: codesign -s "Developer ID Application" ./cli/dist/guppy
+        run: codesign --force --options runtime --sign "Developer ID Application" ./cli/dist/guppy
 
       - name: Switch Xcode
         run: sudo xcode-select -s /Applications/Xcode_16.2.app
