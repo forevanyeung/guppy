@@ -8,7 +8,7 @@ on:
 
 jobs:
   check_cli_cache:
-    runs-on: macos-latest
+    runs-on: ubuntu-latest
     outputs:
       cache-hit: ${{ steps.cache.outputs.cache-hit }}
       version: ${{ steps.gitversion.outputs.MajorMinorPatch }}
