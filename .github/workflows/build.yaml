@@ -53,35 +53,55 @@ jobs:
           path: ${{ steps.archive.outputs.GUPPYPATH }}
           retention-days: 1
 
-  # build_macos:
-  # if: github.event_name == 'workflow_dispatch' || contains(github.event.head_commit.message, '[build]')
-  # needs: build_cli
-  # runs-on: macos-latest
-  # steps:
-  #   - uses: actions/checkout@v4
-  #     with:
-  #       fetch-depth: 0
+  build_macos:
+  if: github.event_name == 'workflow_dispatch' || contains(github.event.head_commit.message, '[build]')
+  needs: build_cli
+  runs-on: macos-latest
+  steps:
+    - uses: actions/checkout@v4
+      with:
+        fetch-depth: 0
     
-  #   - uses: actions/download-artifact@v4
-  #     with:
-  #       name: guppy
-  #       path: ./cli/dist/guppy
+    - uses: actions/download-artifact@v4
+      with:
+        name: guppy
+        path: ./cli/dist/guppy
 
-  #   - name: Sign guppy binary
-  #     run: codesign -s - ./cli/dist/guppy
+    - name: Sign guppy binary
+      run: codesign -s - ./cli/dist/guppy
 
-  #   - name: Build macOS app
-  #     env: 
-  #       VERSION: ${{ needs.build_cli.outputs.VERSION }}
-  #       BUILD: ${{ needs.build_cli.outputs.BUILD }}
-  #     run: make build-macos
+    - name: Build macOS archive
+      env: 
+        VERSION: ${{ needs.build_cli.outputs.VERSION }}
+        BUILD: ${{ needs.build_cli.outputs.BUILD }}
+      run: make build-macos
 
-  #   - name: Package macOS app
-  #     run: ditto -c -k --keepParent ./macos/build/guppy.app ./guppy-macos-${{ env.VERSION }}.zip
+    - name: Export macOS archive
+      run: |
+        xcodebuild \
+          -exportArchive \
+          -archivePath ./macos/build/guppy.xcarchive \
+          -exportPath ./macos/build \
+          -exportOptionsPlist ./macos/ExportOptions.plist
+    
+    - name: Create macOS installer
+      run: |
+        productbuild \
+          --component ./macos/build/guppy.app /Applications \
+          ./macos/build/guppy-${{ needs.build_cli.outputs.VERSION }}.pkg
 
-  #   - name: Upload macOS app
-  #     uses: actions/upload-artifact@v4
-  #     with:
-  #       name: guppy-macos
-  #       path: ./guppy-macos-${{ env.VERSION }}.zip
-  #       retention-days: 1
+    - name: Notarize macOS installer
+      run: |
+        xcrun notarytool submit \
+          --team-id '' \
+          --apple-id ${{ secrets.NOTARY_USERNAME }} \
+          --password ${{ secrets.NOTARY_PASSWORD }} \
+          --wait \
+          ./macos/build/guppy.pkg
+
+    - name: Upload macOS app
+      uses: actions/upload-artifact@v4
+      with:
+        name: guppy-${{ needs.build_cli.outputs.VERSION }}.pkg
+        path: ./macos/build/guppy-${{ needs.build_cli.outputs.VERSION }}.pkg
+        retention-days: 1
