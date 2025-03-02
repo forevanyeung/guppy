@@ -42,9 +42,10 @@ clean-macos:
 .PHONY: build-macos
 
 build-macos: clean-macos
-	xcodebuild -project macos/guppy.xcodeproj \
-	-scheme guppy build \
+	xcodebuild archive \
+	-project ./macos/guppy.xcodeproj \
+	-scheme guppy \
 	-configuration Release \
-	CONFIGURATION_BUILD_DIR="$(PWD)/macos/build" \
+	-archivePath ./macos/build/guppy.xcarchive \
 	$(if $(VERSION),MARKETING_VERSION="$(VERSION)") \
 	$(if $(BUILD),CURRENT_PROJECT_VERSION="$(BUILD)")
