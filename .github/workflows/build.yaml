@@ -38,7 +38,7 @@ jobs:
     needs: check_cli_cache
     if: |
       needs.check_cli_cache.outputs.cache-hit != 'true' && 
-      (github.event_name == 'workflow_dispatch' || contains(github.event.head_commit.message, '[build]'))
+      github.event_name == 'workflow_dispatch'
     runs-on: macos-latest
     steps:
       - uses: actions/checkout@v4
@@ -83,7 +83,7 @@ jobs:
 
   build_macos:
     needs: [check_cli_cache, build_cli]
-    if: always() && (github.event_name == 'workflow_dispatch' || contains(github.event.head_commit.message, '[build]'))
+    if: always() && github.event_name == 'workflow_dispatch'
     runs-on: macos-latest
     steps:
       - uses: actions/checkout@v4
@@ -120,6 +120,9 @@ jobs:
 
       - name: Sign guppy binary
         run: codesign -s "Developer ID Application" ./cli/dist/guppy
+
+      - name: Switch Xcode
+        run: sudo xcode-select -s /Applications/Xcode_16.2.app
 
       - name: Build macOS archive
         env: 
