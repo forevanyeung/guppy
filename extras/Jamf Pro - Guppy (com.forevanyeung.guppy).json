@@ -1,0 +1,18 @@
+{
+    "title": "Guppy (com.forevanyeung.guppy)",
+    "description": "Guppy Managed Settings",
+    "properties": {
+        "GoogleOauth2ClientId": {
+            "type": "string",
+            "title": "Google Oauth2 Client Id",
+            "description": "Client ID used for Google OAuth2 authentication.",
+            "property_order": 1
+        },
+        "DisableAnalytics": {
+            "type": "boolean",
+            "title": "Disable Analytics",
+            "description": "Turn off sending anonymized analytics to guppy.",
+            "property_order": 10
+        }
+    }
+}
