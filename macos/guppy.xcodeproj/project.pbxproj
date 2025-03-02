@@ -24,7 +24,7 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
-		8D805D572D5D2CF600F13923 /* guppy.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = guppy.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		8D805D572D5D2CF600F13923 /* guppy (Development).app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "guppy (Development).app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		8D805D682D5D2CF900F13923 /* guppyTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = guppyTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		8D805D722D5D2CF900F13923 /* guppyUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = guppyUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
@@ -104,7 +104,7 @@
 		8D805D582D5D2CF600F13923 /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				8D805D572D5D2CF600F13923 /* guppy.app */,
+				8D805D572D5D2CF600F13923 /* guppy (Development).app */,
 				8D805D682D5D2CF900F13923 /* guppyTests.xctest */,
 				8D805D722D5D2CF900F13923 /* guppyUITests.xctest */,
 			);
@@ -134,7 +134,7 @@
 			packageProductDependencies = (
 			);
 			productName = guppy;
-			productReference = 8D805D572D5D2CF600F13923 /* guppy.app */;
+			productReference = 8D805D572D5D2CF600F13923 /* guppy (Development).app */;
 			productType = "com.apple.product-type.application";
 		};
 		8D805D672D5D2CF900F13923 /* guppyTests */ = {
@@ -467,12 +467,13 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				ASSETCATALOG_COMPILER_INCLUDE_ALL_APPICON_ASSETS = NO;
-				CODE_SIGN_ENTITLEMENTS = guppy/guppy.entitlements;
+				CODE_SIGN_ENTITLEMENTS = guppy/guppyRelease.entitlements;
 				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "-";
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_ASSET_PATHS = "\"guppy/Preview Content\"";
+				ENABLE_HARDENED_RUNTIME = YES;
 				ENABLE_PREVIEWS = YES;
 				ENABLE_USER_SCRIPT_SANDBOXING = NO;
 				GENERATE_INFOPLIST_FILE = YES;
