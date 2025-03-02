@@ -36,9 +36,7 @@ jobs:
 
   build_cli:
     needs: check_cli_cache
-    if: |
-      needs.check_cli_cache.outputs.cache-hit != 'true' && 
-      github.event_name == 'workflow_dispatch'
+    if: needs.check_cli_cache.outputs.cache-hit != 'true'
     runs-on: macos-latest
     steps:
       - uses: actions/checkout@v4
@@ -83,7 +81,7 @@ jobs:
 
   build_macos:
     needs: [check_cli_cache, build_cli]
-    if: always() && github.event_name == 'workflow_dispatch'
+    if: always()
     runs-on: macos-latest
     steps:
       - uses: actions/checkout@v4
