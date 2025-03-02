@@ -43,6 +43,9 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      - id: cachekey
+        run: echo "cachekey=${{ hashFiles('cli/[!dist]**', 'cli/**/[!dist]**', 'go.mod', 'go.sum') }}" >> $GITHUB_OUTPUT
+
       - uses: actions/setup-go@v5
         with:
           go-version-file: 'go.mod'
@@ -69,7 +72,7 @@ jobs:
         uses: actions/cache/save@v4
         with:
           path: ./cli/dist
-          key: ${{ runner.os }}-cli-${{ hashFiles('cli/[!dist]**', 'cli/**/[!dist]**', 'go.mod', 'go.sum') }}
+          key: ${{ runner.os }}-cli-${{ steps.cachekey.outputs.cachekey }}
 
       - name: Upload Artifact
         uses: actions/upload-artifact@v4
