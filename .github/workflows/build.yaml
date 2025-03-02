@@ -7,9 +7,12 @@ on:
   workflow_dispatch:
 
 jobs:
-  build_cli:
-    if: github.event_name == 'workflow_dispatch' || contains(github.event.head_commit.message, '[build]')
+  check_cli_cache:
     runs-on: macos-latest
+    outputs:
+      cache-hit: ${{ steps.cache.outputs.cache-hit }}
+      version: ${{ steps.gitversion.outputs.MajorMinorPatch }}
+      build: ${{ steps.gitversion.outputs.BuildNumber }}
     steps:
       - uses: actions/checkout@v4
         with:
@@ -24,6 +27,22 @@ jobs:
         id: gitversion
         uses: gittools/actions/gitversion/execute@v3
 
+      - name: Check CLI cache
+        id: cache
+        uses: actions/cache@v4
+        with:
+          path: ./cli/dist
+          key: ${{ runner.os }}-cli-${{ hashFiles('cli/**', 'go.mod', 'go.sum') }}
+
+  build_cli:
+    needs: check_cli_cache
+    if: |
+      needs.check_cli_cache.outputs.cache-hit != 'true' && 
+      (github.event_name == 'workflow_dispatch' || contains(github.event.head_commit.message, '[build]'))
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v4
+
       - uses: actions/setup-go@v5
         with:
           go-version-file: 'go.mod'
@@ -33,39 +52,45 @@ jobs:
 
       - name: Build guppy
         env:
-          VERSION: ${{ steps.gitversion.outputs.MajorMinorPatch }}
+          VERSION: ${{ needs.check_cli_cache.outputs.version }}
           POSTHOG_ENDPOINT: ${{ secrets.POSTHOG_ENDPOINT }}
           POSTHOG_API_KEY: ${{ secrets.POSTHOG_API_KEY }}
         run: make build
 
-      - name: Archive Binary
-        id: archive
-        env:
-          VERSION: ${{ steps.gitversion.outputs.MajorMinorPatch }}
-        run: |
-          tar -czvf guppy-${{ env.VERSION }}.tar.gz ./cli/dist/guppy
-          echo "GUPPYPATH=guppy-${{ env.VERSION }}.tar.gz" >> $GITHUB_OUTPUT
+      # - name: Archive Binary
+      #   id: archive
+      #   env:
+      #     VERSION: ${{ needs.check_cli_cache.outputs.version }}
+      #   run: |
+      #     tar -czvf guppy-${{ env.VERSION }}.tar.gz ./cli/dist/guppy
+      #     echo "GUPPYPATH=guppy-${{ env.VERSION }}.tar.gz" >> $GITHUB_OUTPUT
+
+      - name: Save to cache
+        uses: actions/cache/save@v4
+        with:
+          path: ./cli/dist
+          key: ${{ runner.os }}-cli-${{ hashFiles('cli/**', 'go.mod', 'go.sum') }}
 
       - name: Upload Artifact
         uses: actions/upload-artifact@v4
         with:
           name: guppy
-          path: ${{ steps.archive.outputs.GUPPYPATH }}
+          path: ./cli/dist/guppy
           retention-days: 1
 
   build_macos:
-    if: github.event_name == 'workflow_dispatch' || contains(github.event.head_commit.message, '[build]')
-    needs: build_cli
+    needs: [check_cli_cache, build_cli]
+    if: always() && (github.event_name == 'workflow_dispatch' || contains(github.event.head_commit.message, '[build]'))
     runs-on: macos-latest
     steps:
       - uses: actions/checkout@v4
+
+      - name: Restore CLI from cache
+        uses: actions/cache/restore@v4
         with:
-          fetch-depth: 0
-      
-      - uses: actions/download-artifact@v4
-        with:
-          name: guppy
-          path: ./cli/dist/guppy
+          path: ./cli/dist
+          key: ${{ runner.os }}-cli-${{ hashFiles('cli/**', 'go.mod', 'go.sum') }}
+          fail-on-cache-miss: true
 
       - name: Setup keychain
         env:
@@ -77,8 +102,8 @@ jobs:
           KEYCHAIN_PASSWORD=$(openssl rand -base64 32)
           KEYCHAIN_PATH=$RUNNER_TEMP/app-signing.keychain-db
 
-          # import certificate and provisioning profile from secrets
-          echo -n "$BUILD_CERTIFICATE_BASE64" | base64 --decode -o $CERTIFICATE_PATH
+          # import certificate from secrets
+          echo -n "$CERTIFICATE_BASE64" | base64 --decode -o $CERTIFICATE_PATH
 
           # create temporary keychain
           security create-keychain -p "$KEYCHAIN_PASSWORD" $KEYCHAIN_PATH
@@ -86,7 +111,7 @@ jobs:
           security unlock-keychain -p "$KEYCHAIN_PASSWORD" $KEYCHAIN_PATH
 
           # import certificate to keychain
-          security import $CERTIFICATE_PATH -P "$P12_PASSWORD" -A -t cert -f pkcs12 -k $KEYCHAIN_PATH
+          security import $CERTIFICATE_PATH -P "$CERTIFICATE_PASSWORD" -A -t cert -f pkcs12 -k $KEYCHAIN_PATH
           security set-key-partition-list -S apple-tool:,apple: -k "$KEYCHAIN_PASSWORD" $KEYCHAIN_PATH
           security list-keychain -d user -s $KEYCHAIN_PATH
 
@@ -95,8 +120,8 @@ jobs:
 
       - name: Build macOS archive
         env: 
-          VERSION: ${{ needs.build_cli.outputs.VERSION }}
-          BUILD: ${{ needs.build_cli.outputs.BUILD }}
+          VERSION: ${{ needs.check_cli_cache.outputs.version }}
+          BUILD: ${{ needs.check_cli_cache.outputs.build }}
         run: make build-macos
 
       - name: Export macOS archive
@@ -111,20 +136,20 @@ jobs:
         run: |
           productbuild \
             --component ./macos/build/guppy.app /Applications \
-            ./macos/build/guppy-${{ needs.build_cli.outputs.VERSION }}.pkg
+            ./macos/build/guppy-${{ needs.check_cli_cache.outputs.version }}.pkg
 
       - name: Notarize macOS installer
         run: |
           xcrun notarytool submit \
-            --team-id L8SL8KUNVD' \
+            --team-id 'L8SL8KUNVD' \
             --apple-id ${{ secrets.NOTARY_USERNAME }} \
             --password ${{ secrets.NOTARY_PASSWORD }} \
             --wait \
-            ./macos/build/guppy.pkg
+            ./macos/build/guppy-${{ needs.check_cli_cache.outputs.version }}.pkg
 
       - name: Upload macOS app
         uses: actions/upload-artifact@v4
         with:
-          name: guppy-${{ needs.build_cli.outputs.VERSION }}.pkg
-          path: ./macos/build/guppy-${{ needs.build_cli.outputs.VERSION }}.pkg
+          name: guppy-${{ needs.check_cli_cache.outputs.version }}.pkg
+          path: ./macos/build/guppy-${{ needs.check_cli_cache.outputs.version }}.pkg
           retention-days: 1
