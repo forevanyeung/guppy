@@ -32,7 +32,7 @@ jobs:
         uses: actions/cache@v4
         with:
           path: ./cli/dist
-          key: ${{ runner.os }}-cli-${{ hashFiles('cli/[!dist]**', 'cli/**/[!dist]**', 'go.mod', 'go.sum') }}
+          key: cli-${{ hashFiles('cli/[!dist]**', 'cli/**/[!dist]**', 'go.mod', 'go.sum') }}
 
   build_cli:
     needs: check_cli_cache
@@ -70,7 +70,7 @@ jobs:
         uses: actions/cache/save@v4
         with:
           path: ./cli/dist
-          key: ${{ runner.os }}-cli-${{ steps.cachekey.outputs.cachekey }}
+          key: cli-${{ steps.cachekey.outputs.cachekey }}
 
       - name: Upload Artifact
         uses: actions/upload-artifact@v4
@@ -90,7 +90,7 @@ jobs:
         uses: actions/cache/restore@v4
         with:
           path: ./cli/dist
-          key: ${{ runner.os }}-cli-${{ hashFiles('cli/[!dist]**', 'cli/**/[!dist]**', 'go.mod', 'go.sum') }}
+          key: cli-${{ hashFiles('cli/[!dist]**', 'cli/**/[!dist]**', 'go.mod', 'go.sum') }}
           fail-on-cache-miss: true
 
       - name: Setup keychain
