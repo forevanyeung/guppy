@@ -142,14 +142,14 @@ jobs:
             --component ./macos/build/guppy.app /Applications \
             ./macos/build/guppy-${{ needs.check_cli_cache.outputs.version }}.pkg
 
-      - name: Notarize macOS installer
-        run: |
-          xcrun notarytool submit \
-            --team-id 'L8SL8KUNVD' \
-            --apple-id ${{ secrets.NOTARY_USERNAME }} \
-            --password ${{ secrets.NOTARY_PASSWORD }} \
-            --wait \
-            ./macos/build/guppy-${{ needs.check_cli_cache.outputs.version }}.pkg
+      # - name: Notarize macOS installer
+      #   run: |
+      #     xcrun notarytool submit \
+      #       --team-id 'L8SL8KUNVD' \
+      #       --apple-id ${{ secrets.NOTARY_USERNAME }} \
+      #       --password ${{ secrets.NOTARY_PASSWORD }} \
+      #       --wait \
+      #       ./macos/build/guppy-${{ needs.check_cli_cache.outputs.version }}.pkg
 
       - name: Upload macOS app
         uses: actions/upload-artifact@v4
