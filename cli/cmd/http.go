@@ -7,9 +7,8 @@ import (
 	"net/http"
 	"os"
 	"os/signal"
-	"path/filepath"
-	"runtime"
 	"syscall"
+	"io/fs"
 )
 
 type OAuthResponse struct {
@@ -25,15 +24,16 @@ type OAuthResponseError struct {
 }
 
 func httpServer(newAuthChan chan string, statusChan chan GuppyStatus, serverDoneChan chan bool) {
-	// Get the directory of the current file
-	_, filename, _, _ := runtime.Caller(0)
-	dir := filepath.Dir(filename)
-
-	// Construct the path relative to the current file
-	staticDir := filepath.Join(dir, "../static")
+	// Create a sub-filesystem that only sees contents inside the static directory
+    subFS, err := fs.Sub(staticFiles, "static")
+    if err != nil {
+        slog.Error("Failed to create sub filesystem", "err", err)
+        return
+    }
+	fsys := http.FileServer(http.FS(subFS))
 	
 	mux := http.NewServeMux()
-	mux.Handle("GET /", http.FileServer(http.Dir(staticDir)))
+	mux.Handle("GET /", fsys)
 	mux.HandleFunc("POST /auth", authHttp(newAuthChan))
 	mux.HandleFunc("GET /status", statusHttp(statusChan, serverDoneChan))
 
