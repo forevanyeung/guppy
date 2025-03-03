@@ -135,21 +135,32 @@ jobs:
             -archivePath ./macos/build/guppy.xcarchive \
             -exportPath ./macos/build \
             -exportOptionsPlist ./macos/ExportOptions.plist
-      
+
+      - name: Compress macOS app
+        run: |
+          APP_PATH="./macos/build/guppy.app"
+          ZIP_PATH="./macos/build/guppy.zip"
+
+          # Create a ZIP archive suitable for notarization.
+          /usr/bin/ditto -c -k --keepParent "$APP_PATH" "$ZIP_PATH"
+
+      - name: Notarize macOS installer
+        run: |
+          xcrun notarytool submit ./macos/build/guppy.zip \
+            --team-id 'L8SL8KUNVD' \
+            --apple-id ${{ secrets.NOTARY_USERNAME }} \
+            --password ${{ secrets.NOTARY_PASSWORD }} \
+            --wait
+
+      - name: Staple macOS installer
+        run: |
+          xcrun stapler staple ./macos/build/guppy.app
+
       - name: Create macOS installer
         run: |
           productbuild \
             --component ./macos/build/guppy.app /Applications \
             ./macos/build/guppy-${{ needs.check_cli_cache.outputs.version }}.pkg
-
-      # - name: Notarize macOS installer
-      #   run: |
-      #     xcrun notarytool submit \
-      #       --team-id 'L8SL8KUNVD' \
-      #       --apple-id ${{ secrets.NOTARY_USERNAME }} \
-      #       --password ${{ secrets.NOTARY_PASSWORD }} \
-      #       --wait \
-      #       ./macos/build/guppy-${{ needs.check_cli_cache.outputs.version }}.pkg
 
       - name: Upload macOS app
         uses: actions/upload-artifact@v4
