@@ -150,6 +150,7 @@ jobs:
             --team-id 'L8SL8KUNVD' \
             --apple-id ${{ secrets.NOTARY_USERNAME }} \
             --password ${{ secrets.NOTARY_PASSWORD }} \
+            --timeout 60
             --wait
 
       - name: Staple macOS installer
