@@ -14,7 +14,7 @@ struct guppyApp: App {
 
     var body: some Scene {
         return Settings {
-            EmptyView()
+            SettingsView()
         }
     }
 }
@@ -36,6 +36,11 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     }
     
     func applicationDidFinishLaunching(_ notification: Notification) {
+        if ProcessInfo.processInfo.environment["XCODE_RUNNING_FOR_PREVIEWS"] == "1" {
+            return
+        }
+
+        
         // Filter and process command line arguments
         let relevantArguments = CommandLine.arguments.dropFirst().filter { arg in
             !arg.hasPrefix("-") && arg != "YES" && !arg.hasSuffix(".app")
