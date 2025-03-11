@@ -1,0 +1,65 @@
+name: Release guppy
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  actions: read
+
+jobs:
+  promote_to_release:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Install GitVersion
+        uses: gittools/actions/gitversion/setup@v3
+        with:
+          versionSpec: '6.0.x'
+
+      - name: Determine Version
+        id: gitversion
+        uses: gittools/actions/gitversion/execute@v3
+
+      # Find the successful build workflow run from the merged PR
+      - name: Get Build Workflow Run
+        id: build-run
+        run: |
+          run_id=$(gh api /repos/${{ github.repository }}/actions/runs \
+            --jq '.workflow_runs[] | select(.head_sha == "${{ github.sha }}" and .name == "Build guppy" and .conclusion == "success") | .id' \
+            | head -n1)
+          echo "run_id=$run_id" >> $GITHUB_OUTPUT
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Download CLI artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: guppy
+          path: ./cli/dist
+          run-id: ${{ steps.build-run.outputs.run_id }}
+
+      - name: Download macOS artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: guppy-${{ steps.gitversion.outputs.MajorMinorPatch }}.pkg
+          path: ./macos/build
+          run-id: ${{ steps.build-run.outputs.run_id }}
+
+      - name: Create Release
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          VERSION: ${{ steps.gitversion.outputs.MajorMinorPatch }}
+        run: |
+          gh release create "$VERSION" \
+            --title "Guppy $VERSION" \
+            --draft \
+            --notes "Release notes for $VERSION" \
+            "./cli/dist/guppy" \
+            "./macos/build/guppy-$VERSION.pkg"

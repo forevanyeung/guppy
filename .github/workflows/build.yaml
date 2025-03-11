@@ -1,7 +1,7 @@
 name: Build guppy
 
 on: 
-  push:
+  pull_request:
     branches:
       - main
   workflow_dispatch:
@@ -34,6 +34,13 @@ jobs:
           path: ./cli/dist
           key: cli-${{ hashFiles('cli/[!dist]**', 'cli/**/[!dist]**', 'go.mod', 'go.sum') }}
 
+      - name: Upload Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: guppy
+          path: ./cli/dist/guppy
+          retention-days: 1
+
   build_cli:
     needs: check_cli_cache
     if: needs.check_cli_cache.outputs.cache-hit != 'true'
@@ -57,14 +64,6 @@ jobs:
           POSTHOG_ENDPOINT: ${{ secrets.POSTHOG_ENDPOINT }}
           POSTHOG_API_KEY: ${{ secrets.POSTHOG_API_KEY }}
         run: make build
-
-      # - name: Archive Binary
-      #   id: archive
-      #   env:
-      #     VERSION: ${{ needs.check_cli_cache.outputs.version }}
-      #   run: |
-      #     tar -czvf guppy-${{ env.VERSION }}.tar.gz ./cli/dist/guppy
-      #     echo "GUPPYPATH=guppy-${{ env.VERSION }}.tar.gz" >> $GITHUB_OUTPUT
 
       - name: Save to cache
         uses: actions/cache/save@v4
