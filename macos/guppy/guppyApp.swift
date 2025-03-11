@@ -13,10 +13,30 @@ struct guppyApp: App {
     @NSApplicationDelegateAdaptor(AppDelegate.self) var appDelegate
 
     var body: some Scene {
-        return Settings {
+        Settings() {
             SettingsView()
         }
     }
+}
+
+func isFirstLaunch() -> Bool {
+    let key = "hasLaunchedBefore"
+    let launchedBefore = UserDefaults.standard.bool(forKey: key)
+
+    if !launchedBefore {
+        UserDefaults.standard.set(true, forKey: key)
+        UserDefaults.standard.synchronize()
+        return true
+    }
+
+    return false
+}
+
+func openSettings() {
+    let environment = EnvironmentValues()
+    environment.openSettings()
+    NSApp.setActivationPolicy(.regular)
+    NSApp.activate(ignoringOtherApps: true)
 }
 
 class AppDelegate: NSObject, NSApplicationDelegate {
@@ -39,7 +59,11 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         if ProcessInfo.processInfo.environment["XCODE_RUNNING_FOR_PREVIEWS"] == "1" {
             return
         }
-
+        
+        if(isFirstLaunch()) {
+            NSLog("Setting guppy as default on first launch")
+            setDefaultHandler(for: contentTypes)
+        }
         
         // Filter and process command line arguments
         let relevantArguments = CommandLine.arguments.dropFirst().filter { arg in
@@ -51,10 +75,9 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         if !urls.isEmpty {
             application(NSApplication.shared, open: urls)
         } else {
-            print("No files to process")
-            #if !DEBUG
-            NSApplication.shared.terminate(nil)
-            #endif
+            // Open settings if app is opened directly without any file
+            NSLog("guppy opened with no files, defaulting to opening settings")
+            openSettings()
         }
     }
     
