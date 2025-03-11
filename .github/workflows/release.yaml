@@ -13,6 +13,9 @@ permissions:
 jobs:
   promote_to_release:
     runs-on: ubuntu-latest
+    outputs:
+      version: ${{ steps.gitversion.outputs.MajorMinorPatch }}
+      build_run_id: ${{ steps.build-run.outputs.run_id }}
     steps:
       - uses: actions/checkout@v4
         with:
@@ -40,6 +43,7 @@ jobs:
 
       - name: Download CLI artifact
         uses: actions/download-artifact@v4
+        if: steps.build-run.outputs.run_id != ''
         with:
           name: guppy
           path: ./cli/dist
@@ -47,15 +51,44 @@ jobs:
 
       - name: Download macOS artifact
         uses: actions/download-artifact@v4
+        if: steps.build-run.outputs.run_id != ''
         with:
           name: guppy-${{ steps.gitversion.outputs.MajorMinorPatch }}.pkg
           path: ./macos/build
           run-id: ${{ steps.build-run.outputs.run_id }}
 
+  build:
+    needs: promote_to_release
+    if: needs.promote_to_release.outputs.build_run_id == ''
+    uses: ./.github/workflows/build.yaml
+    secrets: inherit
+
+  create_release:
+    needs: [promote_to_release, build]
+    if: always() && !failure() && !cancelled()
+    runs-on: ubuntu-latest
+    steps:
+      - name: Download CLI artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: guppy
+          path: ./cli/dist
+          run-id: ${{ needs.promote_to_release.outputs.build_run_id != '' && needs.promote_to_release.outputs.build_run_id || github.run_id }}
+
+      - name: Download macOS artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: guppy-${{ needs.promote_to_release.outputs.version }}.pkg
+          path: ./macos/build
+          run-id: ${{ needs.promote_to_release.outputs.build_run_id != '' && needs.promote_to_release.outputs.build_run_id || github.run_id }}
+
+      - name: Make CLI executable
+        run: chmod +x ./cli/dist/guppy
+
       - name: Create Release
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          VERSION: ${{ steps.gitversion.outputs.MajorMinorPatch }}
+          VERSION: ${{ needs.promote_to_release.outputs.version }}
         run: |
           gh release create "$VERSION" \
             --title "Guppy $VERSION" \
