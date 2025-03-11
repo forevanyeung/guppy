@@ -78,13 +78,37 @@ jobs:
           name: guppy
           path: ./cli/dist/guppy
           retention-days: 1
-
-  build_macos:
+  
+  check_macos_cache:
     needs: [check_cli_cache, build_cli]
     if: always()
+    runs-on: ubuntu-latest
+    outputs:
+      cache-hit: ${{ steps.cache.outputs.cache-hit }}
+    steps:
+      - name: Check CLI cache
+        id: cache
+        uses: actions/cache@v4
+        with:
+          path: ./macos/build
+          key: macos-${{ hashFiles('macos/[!build]**', 'maco/**/[!build]**') }}
+
+      - name: Upload macOS app
+        uses: actions/upload-artifact@v4
+        with:
+          name: guppy-${{ needs.check_cli_cache.outputs.version }}.pkg
+          path: ./macos/build/guppy-${{ needs.check_cli_cache.outputs.version }}.pkg
+          retention-days: 1
+  
+  build_macos:
+    needs: [check_cli_cache, build_cli, check_macos_cache]
+    if: always() && needs.check_cli_cache.outputs.cache-hit != 'true'
     runs-on: macos-latest
     steps:
       - uses: actions/checkout@v4
+
+      - id: cachekey
+        run: echo "cachekey=${{ hashFiles('macos/[!build]**', 'maco/**/[!build]**') }}" >> $GITHUB_OUTPUT
 
       - name: Restore CLI from cache
         uses: actions/cache/restore@v4
@@ -162,6 +186,12 @@ jobs:
           productbuild \
             --component ./macos/build/guppy.app /Applications \
             ./macos/build/guppy-${{ needs.check_cli_cache.outputs.version }}.pkg
+
+      - name: Save to cache
+        uses: actions/cache/save@v4
+        with:
+          path: ./macos/build
+          key: macos-${{ steps.cachekey.outputs.cachekey }}
 
       - name: Upload macOS app
         uses: actions/upload-artifact@v4
