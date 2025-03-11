@@ -47,5 +47,6 @@ build-macos: clean-macos
 	-scheme guppy \
 	-configuration Release \
 	-archivePath ./macos/build/guppy.xcarchive \
+	PRODUCT_NAME="guppy" \
 	$(if $(VERSION),MARKETING_VERSION="$(VERSION)") \
 	$(if $(BUILD),CURRENT_PROJECT_VERSION="$(BUILD)")
