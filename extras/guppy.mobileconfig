@@ -5,6 +5,18 @@
         <key>PayloadContent</key>
         <array>
             <dict>
+                <key>PayloadDisplayName</key>
+                <string>Custom Settings</string>
+                <key>PayloadIdentifier</key>
+                <string>79663069-1865-4C0B-9C2F-72977D4C5C79</string>
+                <key>PayloadOrganization</key>
+                <string></string>
+                <key>PayloadType</key>
+                <string>com.apple.ManagedClient.preferences</string>
+                <key>PayloadUUID</key>
+                <string>79663069-1865-4C0B-9C2F-72977D4C5C79</string>
+                <key>PayloadVersion</key>
+                <integer>1</integer>
                 <key>PayloadContent</key>
                 <dict>
                     <key>com.forevanyeung.guppy</key>
@@ -15,7 +27,7 @@
                                 <key>mcx_preference_settings</key>
                                 <dict>
                                     <key>GoogleOauth2ClientId</key>
-                                    <string></string>
+                                    <string>xxxxxxxxxxxxxxxxxxxx.apps.googleusercontent.com</string>
                                     <key>DisableAnalytics</key>
                                     <false />
                                 </dict>
@@ -25,5 +37,25 @@
                 </dict>
             </dict>
         </array>
+        <key>PayloadUUID</key>
+        <string>F3800699-4456-4B39-837F-8BBBBA8306BF</string>
+        <key>PayloadType</key>
+        <string>Configuration</string>
+        <key>PayloadOrganization</key>
+        <string></string>
+        <key>PayloadIdentifier</key>
+        <string>F3800699-4456-4B39-837F-8BBBBA8306BF</string>
+        <key>PayloadDisplayName</key>
+        <string>Guppy Configuration</string>
+        <key>PayloadDescription</key>
+        <string />
+        <key>PayloadVersion</key>
+        <integer>1</integer>
+        <key>PayloadEnabled</key>
+        <true />
+        <key>PayloadRemovalDisallowed</key>
+        <false />
+        <key>PayloadScope</key>
+        <string>User</string>
     </dict>
 </plist>
